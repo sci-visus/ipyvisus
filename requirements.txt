@@ -1,0 +1,10 @@
+jupyterlab>=1.0.2
+ipywidgets>=7.5.0
+ipydatawidgets
+traitlets>4.3.0
+pythreejs
+numpy
+aiohttp
+
+
+
