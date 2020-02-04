@@ -2,7 +2,7 @@ from ipywidgets import DOMWidget, register
 from traitlets import Int, Unicode
 
 from .__version__ import EXTENSION_SPEC_VERSION
-MODULE_NAME = '@visus/ipyvisus'
+MODULE_NAME = 'ipyvisus'
 
 
 @register
@@ -20,6 +20,8 @@ class Viewer2d(DOMWidget):
     dataset = Unicode('').tag(sync=True)
     tile_size = Int(512).tag(sync=True)
     format = Unicode('png').tag(sync=True)
+    field = Unicode('').tag(sync=True)
+    time = Int(0).tag(sync=True)
 
     def __init__(self, *args, **kwargs):
         super().__init__(**kwargs)

@@ -5,7 +5,7 @@ from traitlets import Bool, Int, Unicode
 from ipydatawidgets import NDArray, array_serialization
 
 from .__version__ import EXTENSION_SPEC_VERSION
-MODULE_NAME = '@visus/ipyvisus'
+MODULE_NAME = 'ipyvisus'
 
 
 @register

@@ -5,7 +5,7 @@ import { EXTENSION_SPEC_VERSION } from './version';
 import './viewer.css'
 import { fetchInfo } from "./utils";
 
-const MODULE_NAME = '@visus/ipyviewer';
+const MODULE_NAME = 'ipyvisus';
 
 export
 class Viewer2dModel extends DOMWidgetModel {
@@ -23,7 +23,9 @@ class Viewer2dModel extends DOMWidgetModel {
       proxy: null,
       dataset: null,
       tile_size: 512,
-      format: ''
+      format: '',
+      field: '',
+      time: 0
     }
   }
 }
@@ -73,6 +75,8 @@ function Panel(view, el) {
   model.on('change:proxy', update_sources);
   model.on('change:tile_size', update_sources);
   model.on('change:format', update_sources);
+  model.on('change:time', update_sources);
+  model.on('change:field', update_sources);
 
   dataset_changed();
 
@@ -80,6 +84,7 @@ function Panel(view, el) {
     let dataset = model.get('dataset');
     if (dataset && dataset !== '') {
       dataset_info = await fetchInfo(model.get('server'), dataset);
+      console.log('dataset_info', dataset_info);
       update_sources();
     } else {
       dataset_info = null;
@@ -101,7 +106,9 @@ function Panel(view, el) {
       viewer.open(createTileSource(server, dataset,
         dataset_info.dims.x, dataset_info.dims.y, dataset_info.nbits,
         model.get("tile_size"),
-        model.get('format')));
+        model.get('format'),
+        model.get('field'),
+        model.get('time')));
     }
   }
 
@@ -116,7 +123,7 @@ function Panel(view, el) {
     });
   }
 
-  function createTileSource(server, dataset, w, h, max_levels, tile_size, format) {
+  function createTileSource(server, dataset, w, h, max_levels, tile_size, format, field, time) {
     let num_levels = parseInt(max_levels / 2, 10);
     return {
         height: h,
@@ -139,6 +146,12 @@ function Panel(view, el) {
             + `&dataset=${encodeURIComponent(dataset)}`
             + `&maxh=${max_levels}`
             + `&toh=${level * 2}`;
+
+            if (field && field != '')
+              url += `&field=${field}`;
+
+          if (time > 0)
+              url += `&time=${time}`;
 
             return url;
         }

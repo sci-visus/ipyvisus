@@ -7,14 +7,14 @@ import * as ipyvisus from './index';
 
 function activate(app, registry) {
   registry.registerWidget({
-    name: '@visus/ipyvisus',
+    name: 'ipyvisus',
     version: EXTENSION_SPEC_VERSION,
     exports: ipyvisus
   });
 }
 
 const extension = {
-  id: '@visus/ipyvisus',
+  id: 'ipyvisus',
   requires: [IJupyterWidgetRegistry],
   activate: activate,
   autoStart: true
