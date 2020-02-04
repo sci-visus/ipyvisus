@@ -71,3 +71,7 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# js
+node_modules/
+lib/
