@@ -1,5 +1,5 @@
 {
-  "name": "@visus/ipyvisus",
+  "name": "ipyvisus",
   "version": "0.1.0",
   "description": "Visus widget viewer based on ipywidgets",
   "author": "Yarden Livnat",
