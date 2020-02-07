@@ -5,7 +5,7 @@ import  * as THREE from 'three';
 import { EXTENSION_SPEC_VERSION } from './version';
 import './viewer.css'
 
-const MODULE_NAME = '@visus/ipyviewer';
+const MODULE_NAME = 'ipyvisus';
 
 export
 class Viewer3dModel extends DOMWidgetModel {

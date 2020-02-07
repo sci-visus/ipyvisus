@@ -25,14 +25,17 @@ class Viewer2dModel extends DOMWidgetModel {
       tile_size: 512,
       format: '',
       field: '',
-      time: 0
+      time: 0,
+      palette: null,
+      times: [],
+      fields: []
     }
   }
 }
 
 Viewer2dModel.serializers = {
   ...DOMWidgetModel.serializers,
-  image: array_serialization,
+  // image: array_serialization,
 };
 
 
@@ -77,6 +80,7 @@ function Panel(view, el) {
   model.on('change:format', update_sources);
   model.on('change:time', update_sources);
   model.on('change:field', update_sources);
+  model.on('change:palette', update_sources);
 
   dataset_changed();
 
@@ -85,9 +89,16 @@ function Panel(view, el) {
     if (dataset && dataset !== '') {
       dataset_info = await fetchInfo(model.get('server'), dataset);
       console.log('dataset_info', dataset_info);
+      model.set('fields', dataset_info.fields);
+      model.set('times', dataset_info.times);
+      model.set('time', dataset_info.times.length > 0 ? dataset_info.times[0] : 0);
+      view.touch();
       update_sources();
     } else {
       dataset_info = null;
+      model.set('fields', []);
+      model.set('times', []);
+      model.set('time', -1);
     }
   }
 
@@ -97,18 +108,23 @@ function Panel(view, el) {
     let dataset = model.get('dataset');
     if (dataset && dataset !== '') {
       let server = model.get('server');
+      // let url = new URL(server);
+      // let protocol = url.protocol;
+      // url.protocol = '';
+
       let proxy = model.get('proxy');
       if (proxy) {
         server = `${proxy}/proxy?server=${server}`
       } else {
-        server = `${server}/mod_visus?}`
+        server = `${server}/mod_visus?`
       }
       viewer.open(createTileSource(server, dataset,
         dataset_info.dims.x, dataset_info.dims.y, dataset_info.nbits,
         model.get("tile_size"),
         model.get('format'),
         model.get('field'),
-        model.get('time')));
+        model.get('time'),
+        model.get('palette')));
     }
   }
 
@@ -123,7 +139,7 @@ function Panel(view, el) {
     });
   }
 
-  function createTileSource(server, dataset, w, h, max_levels, tile_size, format, field, time) {
+  function createTileSource(server, dataset, w, h, max_levels, tile_size, format, field, time, palette) {
     let num_levels = parseInt(max_levels / 2, 10);
     return {
         height: h,
@@ -139,7 +155,10 @@ function Panel(view, el) {
             let [x1, x2] = [size * x,  Math.min(size * (x + 1) - 1, w)];
             let [y1, y2] = [h - Math.min(size * (y + 1) - 1, h), h - size * y];
 
-            let url = `http://${server}`
+            if (!server.startsWith('http'))
+              server = `http://${server}`;
+
+            let url = `${server}`
             + `&action=boxquery`
             + `&compression=${format}`
             + `&box=${x1}%20${x2}%20${y1}%20${y2}`
@@ -147,12 +166,17 @@ function Panel(view, el) {
             + `&maxh=${max_levels}`
             + `&toh=${level * 2}`;
 
-            if (field && field != '')
+            if (field && field !== '')
               url += `&field=${field}`;
 
-          if (time > 0)
+            if (time >= 0)
               url += `&time=${time}`;
 
+            if (palette && palette.length === 4) {
+              url += `&palette=${palette[0]}&palette_min=${palette[1]}&palette_max=${palette[2]}&palette_interp=${palette[3]}`
+            }
+
+            console.log('url=', url);
             return url;
         }
     };
